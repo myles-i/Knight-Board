@@ -16,6 +16,18 @@ class knight_board:
 		board_pd = pd.read_csv(board_txt_file,delimiter= "\n")
 		board = board_pd.board.as_matrix()
 		self.board = np.resize(board,(board_size[1],board_size[0])).transpose()
+		# find teleportation
+		teleportation_idx = np.transpose(np.nonzero(self.board=='T'	))
+		# assume there are either 0 or 2 teleportation ids
+		if teleportation_idx.size !=0:
+			self.T0 = tuple(teleportation_idx[0])
+			self.T1 = tuple(teleportation_idx[1])
+		else:
+			self.T0 = (nan,nan)
+			self.T1 = (nan,nan)
+
+
+		# if teleportation_
 		return
 
 	def get_knight_moves(self,loc):
@@ -94,7 +106,14 @@ class knight_board:
 	def move_knight(self,loc, move, print_board = False):
 		# assume move is legal
 		new_loc = (loc[0] + move[0],loc[1] + move[1])
-		# TODO: add teleportation ability
+		# Teleport if necessary
+		if np.array_equal(self.T0,new_loc):
+			print("T0")
+			new_loc = self.T1
+		elif np.array_equal(self.T1,new_loc):
+			print("T1")
+			new_loc = self.T0	
+
 
 		if self.is_water(new_loc):
 			cost = 2
@@ -113,19 +132,31 @@ class knight_board:
 
 	def print_knight_loc(self,loc):
 		shp = self.board.shape
-		for j in range(0,shp[1]):
-			for i in range(0,shp[0]):
+		for i in range(0,shp[0]):
+			for j in range(0,shp[1]):
 				if np.array_equal([i,j],loc):
 					print_char = 'K '
 				else:
 					print_char = '. '
 
-				if i == (shp[0]-1):
+				if j == (shp[1]-1):
 					print(print_char)
 				else:
 					print(print_char, end="")
 		print('\n\n')	
 
+
+	def print_board(self):
+		shp = self.board.shape
+		print(shp)
+		for i in range(0,shp[0]):
+			for j in range(0,shp[1]):
+
+				if j == (shp[1]-1):
+					print(self.board[i][j])
+				else:
+					print(self.board[i][j], end="")
+		print('\n\n')	
 
 
 	def is_barrier(self,loc):
@@ -136,8 +167,6 @@ class knight_board:
 		return self.board[(loc[0],loc[1])] == 'R'
 	def is_water(self,loc):
 		return self.board[(loc[0],loc[1])] == 'W'
-	def is_teleport(self,loc):
-		return self.board[(loc[0],loc[1])] == 'T'
 	def is_in_bounds(self,loc):
 		shp = self.board.shape
 		for i in range(0,2):
