@@ -8,6 +8,8 @@ class knight_board:
 
 	Attributes:
 	board: an array representing the board
+	T0: tuple containing the location of the first teleportation port
+	T1: tuple containing the location of the second teleportation port
 	"""
 
 	def __init__(self,board_txt_file,board_size):
@@ -31,6 +33,7 @@ class knight_board:
 		return
 
 	def get_knight_moves(self,loc):
+		# this method returns a list of all legal moves given an initial starting position (loc)
 		potential_moves = ((1,2),(1,-2),(-1,2),(-1,-2),(2,1),(2,-1),(-2,1),(-2,-1))
 		moves = list()
 
@@ -41,9 +44,10 @@ class knight_board:
 
 
 	def is_move_legal(self,loc, move):
+		# This method checks to see if the move specified by "move" starting at position "loc" is legal
+
 		# check that this is a valid chess move (not considering board size or other features)
 		if not((abs(move[0]) ==1 or abs(move[0]) == 2) and (abs(move[1]) ==1 or abs(move[1]) ==2)):
-			# print('Move not legal! Does not abide by knight moves')
 			return False
 
 		# derive the three intermediate moves (x then y)
@@ -57,16 +61,19 @@ class knight_board:
 			m2 = (sgn_x,0)
 			m3 = (0,sgn_y)
 
-		# first try x then y, and y then x
+		# The barriers mean that the path that is taken to move from one
+		# position to another matters. For this reason, we check the legality
+		# of moving first in x, then y, and the opposite:
+
+		# first try first moving in x, then in y 
 		move_xy_legal = self.is_move_legal_helper(loc,(m1,m2,m3))
+		# now try first moving in x, then in y 
 		move_yx_legal = self.is_move_legal_helper(loc,(m3,m2,m1))
 		move_legal = move_xy_legal or move_yx_legal
-		# if not(move_legal):
-			# print('Move not legal!')
 		return move_legal
 
 	def is_move_legal_helper(self,loc,intermediate_moves):
-		# checks the intermediate moves of a full move one by one to make sure path is valid
+		# checks the intermediate moves of a full move one by one to make sure path is valid, starting at "loc"
 		loc_temp = (loc[0],loc[1])
 		for interim_move in intermediate_moves:
 			loc_temp = (loc_temp[0] + interim_move[0], loc_temp[1] + interim_move[1])
@@ -82,6 +89,9 @@ class knight_board:
 
 
 	def is_sequence_legal(self, loc, moves,print_board = False):
+		# This method checks if an entire sequence of moves ("moves") starting
+		# at position "loc" are legal. The optional "print_board" argumement
+		# will print the location of the Knight on the board following each move
 		if print_board:
 			print("Starting Location:")
 			self.print_knight_loc(loc)	
@@ -94,7 +104,7 @@ class knight_board:
 		return True # all moves were valid
 
 	def get_sequence_cost(self,start, moves):
-		# assume all moves are legal
+		# Returns the cost of a sequence of moves. Assumes all moves are legal
 		loc = start
 		total_cost = 0
 		for move in moves:
@@ -104,7 +114,8 @@ class knight_board:
 
 
 	def move_knight(self,loc, move, print_board = False):
-		# assume move is legal
+		# Moves the knight from starting location "loc" through move "move"
+		# assumes the move is legal
 		new_loc = (loc[0] + move[0],loc[1] + move[1])
 		# Teleport if necessary
 		if np.array_equal(self.T0,new_loc):
@@ -131,6 +142,7 @@ class knight_board:
 
 
 	def print_knight_loc(self,loc):
+		# Prints a "K" at the knight location "loc", and dots everywhere else on the board
 		shp = self.board.shape
 		for i in range(0,shp[0]):
 			for j in range(0,shp[1]):
@@ -147,6 +159,7 @@ class knight_board:
 
 
 	def print_board(self):
+		# prints the board with all water, barriers and other hazards"
 		shp = self.board.shape
 		print(shp)
 		for i in range(0,shp[0]):
@@ -168,6 +181,7 @@ class knight_board:
 	def is_water(self,loc):
 		return self.board[(loc[0],loc[1])] == 'W'
 	def is_in_bounds(self,loc):
+		# checks to see if the location is within the bounds of the board
 		shp = self.board.shape
 		for i in range(0,2):
 			if loc[i]<0  or loc[i]>(shp[i]-1):

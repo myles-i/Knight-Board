@@ -31,29 +31,28 @@ def modified_manhattan(start, end):
   return (abs(start[0] - end[0]) + abs(start[1] - end[1]))//3
 
 def aStarSearch(knight_board,start,end, heuristic=nullHeuristic):
-    # note: inputs are lists, but they need to be numpy arrays for use with knight_board
+    # Performs A* search with a specified heuristic
     "Search the node that has the lowest combined cost and heuristic first."
     closed=set()
     fringe=PriorityQueue() 
-    fringe.push((start,list(),0) , heuristic(start,end))
+    # Elements of fringe contain ( (position, list of moves), cost + heuristic
+    fringe.push((start,list()) , heuristic(start,end))
     i = 0;
     while True:
         i +=1;
         if fringe.isEmpty():
             return 'failure'  
+        # grab the least costly node
         currentNode=fringe.pop()
         currentLocation=currentNode[0];
-
-
         if np.array_equal(currentLocation,end):
             print("Number of iterations: ",i)
             return currentNode[1]
-        if (currentLocation not in closed):
+        if (currentLocation not in closed): # no need to re-visit nodes we have already seen
             closed.add(currentLocation)
             moves=knight_board.get_knight_moves(currentLocation)
-            for move in moves:
+            for move in moves: # add all to fringe
                 newLocation, cost = knight_board.move_knight(currentLocation,move)
-                # print("newLocation:", newLocation)
                 newSequence = currentNode[1].copy()
                 newSequence.append(move)
                 sequence_cost = knight_board.get_sequence_cost(start,newSequence)
