@@ -19,49 +19,47 @@ class knight_board:
 		return
 
 	def get_knight_moves(self,loc):
-		potential_moves = np.array([[1,2],[1,-2],[-1,2],[-1,-2],[2,1],[2,-1],[-2,1],[-2,-1]])
+		potential_moves = ((1,2),(1,-2),(-1,2),(-1,-2),(2,1),(2,-1),(-2,1),(-2,-1))
 		moves = list()
 
 		for move in potential_moves:
-			if self.is_legal(loc, move):
-				moves.append((new_loc,new_loc_cost))
+			if self.is_move_legal(loc, move):
+				moves.append(move)
 		return moves
 
 
 	def is_move_legal(self,loc, move):
 		# check that this is a valid chess move (not considering board size or other features)
-		move_abs = np.abs(move)
-		if not(any(move_abs==1) and any(move_abs==2)):
-			print('Move not legal! Does not abide by knight moves')
+		if not((abs(move[0]) ==1 or abs(move[0]) == 2) and (abs(move[1]) ==1 or abs(move[1]) ==2)):
+			# print('Move not legal! Does not abide by knight moves')
 			return False
 
 		# derive the three intermediate moves (x then y)
 		sgn_x = move[0]//abs(move[0])
 		sgn_y = move[1]//abs(move[1])
-		m1 = [sgn_x,0]
+		m1 = (sgn_x,0)
 		if abs(move[0]) == 1:
-			m2 = [0,sgn_y]
-			m3 = [0,sgn_y]
+			m2 = (0,sgn_y)
+			m3 = (0,sgn_y)
 		else:
-			m2 = [sgn_x,0]
-			m3 = [0,sgn_y]
+			m2 = (sgn_x,0)
+			m3 = (0,sgn_y)
 
 		# first try x then y, and y then x
 		move_xy_legal = self.is_move_legal_helper(loc,(m1,m2,m3))
 		move_yx_legal = self.is_move_legal_helper(loc,(m3,m2,m1))
 		move_legal = move_xy_legal or move_yx_legal
-		if not(move_legal):
-			print('Move not legal!')
+		# if not(move_legal):
+			# print('Move not legal!')
 		return move_legal
 
 	def is_move_legal_helper(self,loc,intermediate_moves):
 		# checks the intermediate moves of a full move one by one to make sure path is valid
-
-		loc_temp = loc.copy()
+		loc_temp = (loc[0],loc[1])
 		for interim_move in intermediate_moves:
-			loc_temp += interim_move
+			loc_temp = (loc_temp[0] + interim_move[0], loc_temp[1] + interim_move[1])
 			# Check for barriers and out of bounds
-			if self.is_barrier(loc_temp) or not(self.is_in_bounds(loc_temp)):
+			if not(self.is_in_bounds(loc_temp)) or self.is_barrier(loc_temp):
 				return False
 
 		# Check if final location is a rock (illegal)
@@ -78,18 +76,39 @@ class knight_board:
 
 		for move in moves:
 			if self.is_move_legal(loc,move):
-				loc = self.move_knight(loc,move, print_board)
+				loc, cost= self.move_knight(loc,move, print_board)
 			else:
 				return False
 		return True # all moves were valid
 
+	def get_sequence_cost(self,start, moves):
+		# assume all moves are legal
+		loc = start
+		total_cost = 0
+		for move in moves:
+			loc, move_cost = self.move_knight(loc,move)
+			total_cost += move_cost
+		return total_cost
+
+
 	def move_knight(self,loc, move, print_board = False):
 		# assume move is legal
+		new_loc = (loc[0] + move[0],loc[1] + move[1])
 		# TODO: add teleportation ability
-		new_loc = loc.copy() + move
+
+		if self.is_water(new_loc):
+			cost = 2
+		elif self.is_lava(new_loc):
+			cost = 5
+		else:
+			cost = 1
+
+
 		if print_board:
 			self.print_knight_loc(new_loc)		
-		return new_loc
+		return new_loc, cost
+
+
 
 
 	def print_knight_loc(self,loc):
