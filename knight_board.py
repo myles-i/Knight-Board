@@ -4,7 +4,9 @@ from math import *
 
 
 class knight_board:
-	""" This class represents a board for a game played with only knight_board
+	""" This class represents a board for a game played with only knights. it 
+	also contains methods for determining possible moves at each location, and the
+	legality of a single or sequence of moves.
 
 	Attributes:
 	board: an array representing the board
@@ -13,8 +15,8 @@ class knight_board:
 	"""
 
 	def __init__(self,board_txt_file,board_size):
-		# board_txt_file: is the filename containing the board information
-		# board_size is the size of the board (row,column)
+		# - board_txt_file: is the filename containing the board information
+		# - board_size: is the size of the board (row,column)
 		board_pd = pd.read_csv(board_txt_file,delimiter= "\n")
 		board = board_pd.board.as_matrix()
 		self.board = np.resize(board,(board_size[1],board_size[0])).transpose()
@@ -28,8 +30,6 @@ class knight_board:
 			self.T0 = (nan,nan)
 			self.T1 = (nan,nan)
 
-
-		# if teleportation_
 		return
 
 	def get_knight_moves(self,loc):
@@ -54,7 +54,7 @@ class knight_board:
 		sgn_x = move[0]//abs(move[0])
 		sgn_y = move[1]//abs(move[1])
 		m1 = (sgn_x,0)
-		if abs(move[0]) == 1:
+		if abs(move[0]) == 1: # if only moving one space in x
 			m2 = (0,sgn_y)
 			m3 = (0,sgn_y)
 		else:
@@ -69,6 +69,7 @@ class knight_board:
 		move_xy_legal = self.is_move_legal_helper(loc,(m1,m2,m3))
 		# now try first moving in x, then in y 
 		move_yx_legal = self.is_move_legal_helper(loc,(m3,m2,m1))
+
 		move_legal = move_xy_legal or move_yx_legal
 		return move_legal
 
@@ -123,7 +124,7 @@ class knight_board:
 			new_loc = self.T1
 		elif np.array_equal(self.T1,new_loc):
 			# print("T1")
-			new_loc = self.T0	
+			new_loc = self.T0
 
 
 		if self.is_water(new_loc):
@@ -135,7 +136,8 @@ class knight_board:
 
 
 		if print_board:
-			self.print_knight_loc(new_loc)		
+			self.print_knight_loc(new_loc)	
+
 		return new_loc, cost
 
 
@@ -159,7 +161,7 @@ class knight_board:
 
 
 	def print_board(self):
-		# prints the board with all water, barriers and other hazards"
+		# prints the board with all water, barriers and other "hazards"
 		shp = self.board.shape
 		print(shp)
 		for i in range(0,shp[0]):
@@ -174,12 +176,16 @@ class knight_board:
 
 	def is_barrier(self,loc):
 		return self.board[(loc[0],loc[1])] == 'B'
+
 	def is_lava(self,loc):
 		return self.board[(loc[0],loc[1])] == 'L'
+
 	def is_rock(self,loc):
 		return self.board[(loc[0],loc[1])] == 'R'
+
 	def is_water(self,loc):
 		return self.board[(loc[0],loc[1])] == 'W'
+
 	def is_in_bounds(self,loc):
 		# checks to see if the location is within the bounds of the board
 		shp = self.board.shape
