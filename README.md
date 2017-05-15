@@ -1,6 +1,9 @@
 #Knight Board
 ###This project implements code for checking move validity and computing the shortest path for moves of a knight chess piece on a chess board.
-- All moves are defined relative to the previous position.
+The knight board can be represented in x,y coordinates. The upper left position
+is (0,0) and the bottom right is (7,7). The convention is (row, column).
+
+- All moves are defined relative to the previous position. Aka (1,2) means move down one row, and right two columns from where the piece previously was.
 - Knight_board.py contains a class that computes all of the game-specific information
 - utils.py contains a simple implementation of a Priority Queue, and A* search algorithm and a few heuristics. These are used to determine the least costly path.
 - A modified manhattan distance heuristic is used here, but there is certainly room for improvement on this front.
