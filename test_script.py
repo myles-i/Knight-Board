@@ -26,13 +26,11 @@ import numpy as numpy
 # # Test Level 4
 # ################################
 board = knight_board("board_2.txt",(28,32))
-print(board.T0)
-print(board.T1)
 start_pos = (0,24);
 end_pos   = (24,29);
 print("Start is:", start_pos)
 print("End is:", end_pos)
-print(solution)
-solution = aStarSearch(board,start_pos, end_pos)
-print(board.is_sequence_legal(start_pos,solution,print_board=True))
+solution = aStarSearch(board,start_pos, end_pos, heuristic=nullHeuristic)
+# solution = aStarSearch(board,start_pos, end_pos, heuristic=modified_manhattan)
+print(board.is_sequence_legal(start_pos,solution,print_board=False))
 print(solution)

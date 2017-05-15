@@ -27,7 +27,8 @@ def nullHeuristic(start, end):
     goal in the provided SearchProblem.  This heuristic is trivial.
     """
     return 0
-
+def modified_manhattan(start, end):
+  return (abs(start[0] - end[0]) + abs(start[1] - end[1]))//3
 
 def aStarSearch(knight_board,start,end, heuristic=nullHeuristic):
     # note: inputs are lists, but they need to be numpy arrays for use with knight_board
@@ -35,14 +36,17 @@ def aStarSearch(knight_board,start,end, heuristic=nullHeuristic):
     closed=set()
     fringe=PriorityQueue() 
     fringe.push((start,list(),0) , heuristic(start,end))
+    i = 0;
     while True:
+        i +=1;
         if fringe.isEmpty():
-            return 'failure'
+            return 'failure'  
         currentNode=fringe.pop()
         currentLocation=currentNode[0];
 
 
         if np.array_equal(currentLocation,end):
+            print("Number of iterations: ",i)
             return currentNode[1]
         if (currentLocation not in closed):
             closed.add(currentLocation)

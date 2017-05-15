@@ -108,10 +108,10 @@ class knight_board:
 		new_loc = (loc[0] + move[0],loc[1] + move[1])
 		# Teleport if necessary
 		if np.array_equal(self.T0,new_loc):
-			print("T0")
+			# print("T0")
 			new_loc = self.T1
 		elif np.array_equal(self.T1,new_loc):
-			print("T1")
+			# print("T1")
 			new_loc = self.T0	
 
 
